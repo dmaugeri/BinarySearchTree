@@ -16,6 +16,7 @@ public class BinarySearchTreeTest
         bst.insertValueRecursive(2);
         bst.insertValueRecursive(4);
 
+
         System.out.println("In Order: ");
         System.out.println("----------------");
         bst.printInOrder();
@@ -35,5 +36,23 @@ public class BinarySearchTreeTest
         System.out.println("DFS: ");
         System.out.println("----------------");
         bst.DFS();
+        System.out.println("----------------");
+        System.out.println("FindNode: 4 -> " + bst.findNode(4).getValue());
+        System.out.println("FindNode: 9 -> " + bst.findNode(9));
+
+        System.out.println("RecursiveFindNode: 4 -> " + bst.recursiveFindNode(4).getValue());
+        System.out.println("RecursiveFindNode: 9 -> " + bst.recursiveFindNode(9));
+
+
+        bst.deleteValue(4);
+        bst.deleteValue(10);
+        bst.deleteValue(15);
+        bst.deleteValue(20);
+
+        System.out.println("-------------------");
+        System.out.println(bst.deleteValueV2(4));
+        System.out.println(bst.deleteValueV2(10));
+        System.out.println(bst.deleteValueV2(15));
+        System.out.println(bst.deleteValueV2(20));
     }
 }
