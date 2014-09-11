@@ -44,7 +44,7 @@ public class BinarySearchTree<T extends Comparable<T>>
     private Node<T> findNode(Node<T> root, T value)
     {
         if (root == null) return null;
-        
+
         T currentValue = root.getValue();
 
         if (currentValue.compareTo(value) == 0) return root;
@@ -53,6 +53,14 @@ public class BinarySearchTree<T extends Comparable<T>>
             return findNode(root.getLeftChild(), value);
         else //if (value.compareTo(currentValue) > 0) 
             return findNode(root.getRightChild(), value);
+    }
+
+    public Node<T> insertValueRecursive(T value)
+    {
+        Node<T> node = new Node<T>(value);
+        if (root == null)
+            this.root = node;
+        return insertNodeRecursiveHelper(root, node);
     }
 
     private Node<T> insertNodeRecursiveHelper(Node<T> root, Node<T> n)
@@ -86,97 +94,178 @@ public class BinarySearchTree<T extends Comparable<T>>
 
         return null;
     }
-    public Node<T> insertValueRecursive(T value)
+
+    public T deleteValue(T value)
     {
-        Node<T> node = new Node<T>(value);
-        if (root == null)
-            this.root = node;
-        return insertNodeRecursiveHelper(root, node);
+        return deleteValueFind(this.root, value);
     }
-    
-    public T deleteValueV2(T value)
+
+    private T deleteValueFind(Node<T> root, T value)
     {
-        return deleteValueFindV2(this.root, value);
+        Node<T> parent = null;
+        Node<T> nodeToBeDeleted = null;
+        Node<T> currentNode = root;
+
+        while (currentNode != null)
+        {
+            T currentValue = currentNode.getValue();
+            if (value.compareTo(currentValue) == 0)
+            {
+                nodeToBeDeleted = currentNode;
+                break;
+            }
+            else if (value.compareTo(currentValue) > 0)
+            {
+                parent = currentNode;
+                currentNode = currentNode.getRightChild();
+            }
+            else if (value.compareTo(currentValue) < 0)
+            {
+                parent = currentNode;
+                currentNode = currentNode.getLeftChild();
+            }
+        }
+
+        //root is null
+        if (nodeToBeDeleted == null)
+            return null;
+
+        return deleteNode(parent, nodeToBeDeleted);
     }
 
     /*
-     * Find's the node to be deleted and the parent of that node
-     * and passes it to the function deleteNode that actually deletes the node
-     * using the parent and the node to be deleted
-     */
-    private T deleteValueFindV2(Node<T> root, T value)
-    {
-        //not in the tree
-        if (root == null)
-            return null;
-
-        T rootValue = root.getValue();
-        if (value.compareTo(rootValue) < 0)
-        {
-            Node<T> leftChild = root.getLeftChild();
-            Node<T> rightChild = root.getRightChild();
-           
-            //if left child is the one we want to delete, pass the parent and the leftchild to delete
-            if (leftChild != null && value.compareTo(leftChild.getValue()) == 0)
-                return deleteNode(root, leftChild);
-            //if right child is the one we want to delete pass the parent and the rightchild to delete
-            else if (rightChild != null && value.compareTo(rightChild.getValue()) == 0)
-                return deleteNode(root, rightChild);
-
-            //else keep looking
-            else
-                return deleteValueFindV2(leftChild, value);
-        }
-        else if (value.compareTo(rootValue) > 0)
-        {
-            Node<T> leftChild = root.getLeftChild();
-            Node<T> rightChild = root.getRightChild();
-            
-            //if left child is the one we want to delete, pass the parent and the leftchild to delete
-            if (leftChild != null && value.compareTo(leftChild.getValue()) == 0)
-                return deleteNode(root, leftChild);
-            //if right child is the one we want to delete pass the parent and the rightchild to delete
-            else if (rightChild != null && value.compareTo(rightChild.getValue()) == 0)
-                return deleteNode(root, rightChild);
-            //else keep looking
-            else
-                return deleteValueFindV2(rightChild, value);
-        }
-        else if (value.compareTo(rootValue) == 0)
-        {
-            //we are deleting the root
-            return deleteNode(null, root);
-
-        }
-            return null;
-
-    }
-
-    /*
-     * Delete's the node if parent is null it deletes the root
+     * Delete's the node 
+     * if parent is null it deletes the root
+     * return the value being deleted or null if it fails
      */
     private T deleteNode(Node<T> parent, Node<T> nodeToBeDeleted)
     {
-        if (parent != null)
+        if (parent == null)
+            return deleteRootOfTree();
+
+        Node<T> leftChild = nodeToBeDeleted.getLeftChild();
+        Node<T> rightChild = nodeToBeDeleted.getRightChild();
+
+        if (leftChild == null && rightChild == null)
         {
-            System.out.println("Parent of node to be deleted: " + parent.getValue() + " Value: " + nodeToBeDeleted.getValue());
+            T value = nodeToBeDeleted.getValue();
+            setAppropriateChildForParentNode(parent, value, null);
+            return value;
         }
-        else
-            System.out.println("Parent of node to be deleted: " + parent + " Value: " + nodeToBeDeleted.getValue());
+        else if (leftChild != null && rightChild == null)
+        {
+            T value = nodeToBeDeleted.getValue();
+            setAppropriateChildForParentNode(parent, value, nodeToBeDeleted.getLeftChild());
+            return value;
+        }
+        else if (leftChild == null && rightChild != null)
+        {
+            T value = nodeToBeDeleted.getValue();
+            setAppropriateChildForParentNode(parent, value, nodeToBeDeleted.getRightChild());
+            return value;
+        }
+        else if (leftChild != null && rightChild != null)
+        {
+            T value = nodeToBeDeleted.getValue();
+            Node<T> min = findMinNodeAndRemoveReferenceToIt(rightChild);
+            if (min == null)
+                return null;
+
+            min.setLeftChild(leftChild);
+            min.setRightChild(rightChild);
+            setAppropriateChildForParentNode(parent, value, min);
+            return value;
+        }
+
+
         return nodeToBeDeleted.getValue();
     }
 
-    /*
-     *Deletes value assuming that each child knows it's parent node
-     *Returns null if value does not exist in the tree
-     */
-    public T deleteValue(T value)
+    private T deleteRootOfTree()
     {
-        Node<T> nodeToBeDeleted = findNode(value);
-        if (nodeToBeDeleted == null)
+        if (this.root == null)
             return null;
-        return deleteNode(nodeToBeDeleted.getParent(), nodeToBeDeleted);
+
+        Node<T> leftChild = this.root.getLeftChild();
+        Node<T> rightChild = this.root.getRightChild();
+        //if parent is null then we are dealing with the this.root of the tree
+        if (leftChild == null && rightChild == null)
+        {
+            T value = this.root.getValue();
+            this.root = null;
+            return value;
+        }
+        else if (leftChild != null && rightChild == null)
+        {
+            T value = this.root.getValue();
+            this.root = null;
+            this.root = leftChild;
+            return value;
+        }
+        else if (leftChild == null && rightChild != null)
+        {
+            T value = this.root.getValue();
+            this.root = null;
+            this.root = rightChild;
+            return value;
+        }
+        else //if (leftChild != null && rightChild != null)
+        {
+            //find the minimum of the right subtree of the node to be deleted
+            T value = this.root.getValue();
+            Node<T> min = findMinNodeAndRemoveReferenceToIt(rightChild);
+            if (min == null)
+                return null;
+
+            min.setLeftChild(root.getLeftChild());
+            min.setRightChild(root.getRightChild());
+            this.root = min;
+            return value;
+        }
+
     }
+
+    private void setAppropriateChildForParentNode(Node<T> parent, T compareValue, Node<T> newChild)
+    {
+        if (parent == null)
+            return;
+
+        T parentValue = parent.getValue();
+        if (compareValue.compareTo(parentValue) > 0)
+            parent.setRightChild(newChild);
+        else if (compareValue.compareTo(parentValue) < 0)
+            parent.setLeftChild(newChild);
+    } 
+
+    /*
+     * Will return null if root is null
+     */
+    private Node<T> findMinNodeAndRemoveReferenceToIt(Node<T> root)
+    {
+        Node<T> currentRoot = root;
+        Node<T> parent = null;
+
+        while (currentRoot != null)
+        {
+            Node<T> newMin = currentRoot.getLeftChild();
+            if (newMin == null)
+            {
+                //removes the reference of the min node in the tree
+                //by finding the parent of the min node
+                //and the min node must be on the left of the parent
+                if (parent != null)
+                    parent.setLeftChild(null);
+                return currentRoot;
+            }
+            else
+            {
+                parent = currentRoot;
+                currentRoot = currentRoot.getLeftChild();
+            }
+        }
+        return null;
+    }
+
 
     public Node<T> insertValue(T value)
     {
@@ -194,11 +283,11 @@ public class BinarySearchTree<T extends Comparable<T>>
         while (!stack.empty())
         {
             currentRoot = stack.pop();
-            System.out.println(currentRoot.getValue());
+            System.out.print(currentRoot.getValue() + ",");
             if (!set.contains(currentRoot))
             {
                 set.add(currentRoot);
-                
+
                 Node<T> leftChild = currentRoot.getLeftChild();
                 Node<T> rightChild = currentRoot.getRightChild();
 
@@ -217,7 +306,7 @@ public class BinarySearchTree<T extends Comparable<T>>
 
         queue.add(root);
         set.add(root);
-        System.out.println(root.getValue());
+        System.out.print(root.getValue() + ",");
         Node<T> currentRoot;
 
         while((currentRoot = queue.poll()) != null)
@@ -233,22 +322,21 @@ public class BinarySearchTree<T extends Comparable<T>>
             {
                 queue.add(leftChild);
                 set.add(leftChild);
-                System.out.println(leftChild.getValue());
+                System.out.print(leftChild.getValue() + ",");
             }
 
             if (!set.contains(rightChild) && rightChild != null)
             {
                 queue.add(rightChild);
                 set.add(rightChild);
-                System.out.println(rightChild.getValue());
+                System.out.print(rightChild.getValue() + ",");
             }
         }
     }
 
-
     public void printInOrder()
     {
-        InOrderTraversal(root);
+        InOrderTraversal(this.root);
     }
 
     public void printPreOrder()
@@ -267,7 +355,7 @@ public class BinarySearchTree<T extends Comparable<T>>
             return;
 
         InOrderTraversal(root.getLeftChild());
-        System.out.println(root.getValue());
+        System.out.print(root.getValue() + ",");
         InOrderTraversal(root.getRightChild());
     }
 
@@ -276,7 +364,7 @@ public class BinarySearchTree<T extends Comparable<T>>
         if (root == null)
             return;
 
-        System.out.println(root.getValue());
+        System.out.print(root.getValue() + ",");
         PreOrderTraversal(root.getLeftChild());
         PreOrderTraversal(root.getRightChild());
     }
@@ -288,6 +376,6 @@ public class BinarySearchTree<T extends Comparable<T>>
 
         PostOrderTraversal(root.getLeftChild());
         PostOrderTraversal(root.getRightChild());
-        System.out.println(root.getValue());
+        System.out.print(root.getValue() + ",");
     }
 }
