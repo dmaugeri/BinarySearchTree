@@ -100,6 +100,10 @@ public class BinarySearchTree<T extends Comparable<T>>
         return deleteValueFind(this.root, value);
     }
 
+    /*
+     * find the node to delete and it's parent
+     * then delete the node
+     */
     private T deleteValueFind(Node<T> root, T value)
     {
         Node<T> parent = null;
