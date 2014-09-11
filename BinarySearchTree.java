@@ -76,20 +76,14 @@ public class BinarySearchTree<T extends Comparable<T>>
             if (root.getLeftChild() != null)
                 return insertNodeRecursiveHelper(root.getLeftChild(), n);
             else
-            {
                 root.setLeftChild(n);
-                n.setParent(root);
-            }
         }
         else if (newNodeValue.compareTo(rootValue) > 0)
         {
             if (root.getRightChild() != null)
                 return insertNodeRecursiveHelper(root.getRightChild(), n);
             else
-            {
                 root.setRightChild(n);
-                n.setParent(root);
-            }
         }
 
         return null;
