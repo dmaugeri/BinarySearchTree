@@ -186,7 +186,6 @@ public class BinarySearchTree<T extends Comparable<T>>
 
         Node<T> leftChild = this.root.getLeftChild();
         Node<T> rightChild = this.root.getRightChild();
-        //if parent is null then we are dealing with the this.root of the tree
         if (leftChild == null && rightChild == null)
         {
             T value = this.root.getValue();
