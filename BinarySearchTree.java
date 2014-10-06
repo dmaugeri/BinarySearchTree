@@ -266,8 +266,42 @@ public class BinarySearchTree<T extends Comparable<T>>
 
     public Node<T> insertValue(T value)
     {
-        //TODO: implement this function non-recursively
-        return null;
+        Node<T> newNode = new Node<T>(value);
+
+        if (this.root == null)
+        {
+            this.root = newNode;
+            return newNode;
+        }
+
+        Node<T> iteratorNode = this.root;
+        while (iteratorNode != null)
+        {
+            if (value.compareTo(iteratorNode.getValue()) < 0)
+            {
+                Node<T> leftChild = iteratorNode.getLeftChild();
+                iteratorNode = leftChild;
+                if (leftChild != null)
+                    iteratorNode = leftChild;
+                else
+                {
+                    iteratorNode.setLeftChild(newNode);
+                    break;
+                }
+            }
+            else if (value.compareTo(iteratorNode.getValue()) > 0)
+            {
+                Node<T> rightChild = iteratorNode.getRightChild();
+                if (rightChild != null)
+                    iteratorNode = rightChild;
+                else
+                {
+                    iteratorNode.setRightChild(newNode);
+                    break;
+                }
+            }
+        }
+        return newNode;
     }
 
     public void DFS()

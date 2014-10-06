@@ -20,6 +20,9 @@ public class BinarySearchTreeTest
         findNodeTest();
         System.out.println();
         deleteNodeTest();
+        System.out.println();
+        insertNodeTestNonRecursive();
+
     }
 
     public static void deleteNodeTest()
@@ -288,5 +291,20 @@ public class BinarySearchTreeTest
         System.out.print(bst.findNode(25).getValue());
         System.out.println();
         System.out.println(SEPARATOR);
+    }
+
+    public static void insertNodeTestNonRecursive()
+    {
+        BinarySearchTree<Integer> bst = new BinarySearchTree<Integer>();
+        bst.insertValue(5);
+        bst.insertValue(10);
+        bst.insertValue(20);
+        System.out.println("insertNodeTestNonRecursive");
+        System.out.println(SEPARATOR);
+        System.out.println("Expected:");
+        System.out.println("5, 10, 20");
+        System.out.println("Actual:");
+        bst.printInOrder();
+
     }
 }
